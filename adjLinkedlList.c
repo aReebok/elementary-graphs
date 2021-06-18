@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int ARRLEN = 0;
+
 struct Vertex {
     // int d;
     int value;
@@ -55,7 +57,8 @@ Vertex *dequeue(Queue *q){
 }
 
 
-Queue *initQueue(Queue *q){
+Queue *initQueue(){
+    Queue *q = (Queue *)malloc(sizeof(Queue));
     q->first = malloc(sizeof(QNode));
     q->last = malloc(sizeof(QNode));
     q->first = q->last = NULL;
@@ -67,7 +70,7 @@ void printQueue(Queue *q){
     // printf("reached here 66\n");
     while (!isEmpty(q)) {
         // printf("reached here 68\n");
-        printf("hi----%d\n", counter);
+        printf("%d\n", counter);
         dequeue(q);
         counter++;
     }
@@ -110,12 +113,12 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
 
     while ( (fscanf(input, "%d", &int1) == 1) 
          && (fscanf(input, "%d", &int2) == 1) )  { 
-        // if(int1 > max) max = int1;
-        // if(int2 > max) max = int2;
+
         Vertex *curr = (Vertex *)malloc(sizeof(Vertex));
         curr->value = int2;
         curr->next = NULL;
         curr->visited = 0; 
+        int1--; // because array starts at 0.
 
         if(arr[int1] == NULL) {
             // appoint head of the list 
@@ -135,16 +138,61 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
     } 
 
     fclose(input);
-
     return arr;
 }
 
 void bfs(Vertex **adjList){
+    // use ARRLEN
+    int visited[ARRLEN]; 
+    for(int i = 0; i < ARRLEN; i++) {
+        // init all to unvisited status
+        visited[i] = 0;
+    }
+
+    // create a queue, initialize it.
+    Queue *q = initQueue();
+    
+    // enqueue first item. 
+    int s = 0;
+    q = enqueue(q, adjList[s]);
+
+    printf("%d ", s+1);
+    visited[s] = 1;
+
+    while(!isEmpty(q)){
+        Vertex *currVert = dequeue(q);
+        // printf("dequeued %d\n ", currVert->value);
+        Vertex *tempCurr = currVert;
+        if(s == 0) {
+            tempCurr = currVert;
+            s = 1;
+        } else {
+            tempCurr = adjList[currVert->value-1];  
+        }
+
+        while(tempCurr != NULL){
+            if (!visited[tempCurr->value - 1]) printf("%d ", tempCurr->value);        
+            visited[currVert->value - 1] = 1;
+            Vertex *vertValue = (Vertex *)malloc(sizeof(Vertex));
+            vertValue->value = tempCurr->value;
+            vertValue->next = NULL;
+
+            if (!visited[vertValue->value - 1]) {
+                // printf("enqueued %d\n", vertValue->value);
+                q = enqueue(q, vertValue);
+            }
+            tempCurr = tempCurr->next;
+        }
+        // printf("visitied: %d\n", currVert->value);
+    }
+    puts("");
+}
+void dfs(Vertex **adjList){
     // Vertex **tempAdjList = adjList;
     // int i = 0;
     // while(tempAdjList[])
-
 }
+
 
 int main() {
     /* // testing code-----------------------------------
@@ -165,14 +213,15 @@ int main() {
     // printf("reached her/e 84\n");
     printQueue(q1); // prints hi once because len(q) = 1
     //----------------------------------------------- */
-    char *filename = "input.txt";
+    char *filename = "input";
 
-    int arrLen = getMaxVert(filename);
+    ARRLEN = getMaxVert(filename);
     
-    Vertex **adjArr = (Vertex **)malloc(arrLen*sizeof(Vertex *));
+    Vertex **adjArr = (Vertex **)malloc(ARRLEN*sizeof(Vertex *));
 
-    for (int i = 0; i < arrLen; i++) {
+    for (int i = 0; i < ARRLEN; i++) {
         adjArr[i] = NULL;
+        // printf("%d\n", i);
     }
     
     // Vertex *arr[arrLen];
@@ -180,6 +229,8 @@ int main() {
 
     adjArr = makeAdjList(adjArr, filename);
     bfs(adjArr);
-
+    // dfs(adjArr);
+    // need to free all memeory ..
+    // freeAdjArr(adjArr);
     return 0;
 }
