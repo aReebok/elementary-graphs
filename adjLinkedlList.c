@@ -171,19 +171,16 @@ void bfs(Vertex **adjList){
         }
 
         while(tempCurr != NULL){
-            if (!visited[tempCurr->value - 1]) printf("%d ", tempCurr->value);        
-            visited[currVert->value - 1] = 1;
-            Vertex *vertValue = (Vertex *)malloc(sizeof(Vertex));
-            vertValue->value = tempCurr->value;
-            vertValue->next = NULL;
+            if (visited[tempCurr->value - 1] == 0) {
+                printf("%d ", tempCurr->value);
+                q = enqueue(q, tempCurr);
+                visited[tempCurr->value-1]  = 1;
 
-            if (!visited[vertValue->value - 1]) {
-                // printf("enqueued %d\n", vertValue->value);
-                q = enqueue(q, vertValue);
             }
             tempCurr = tempCurr->next;
         }
         // printf("visitied: %d\n", currVert->value);
+        visited[currVert->value - 1] = 2;
     }
     puts("");
 }
@@ -201,7 +198,6 @@ int main() {
     q1 = initQueue(q1);
     printf("Is the queue empty?: %d \n", isEmpty(q1));
     printQueue(q1); // prints nothign because q is empty
-
     // adding verticies.
     Vertex * v1 = malloc(sizeof(Vertex));
     q1 = enqueue(q1, v1);
