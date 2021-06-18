@@ -28,7 +28,6 @@ typedef struct Queue Queue;
 
 int isEmpty(Queue *q){
     if (q->first == NULL) return 1; // is empty
-    // puts("reached here LN 29-- not EMPTY");
     return 0; // is not empty
 }
 
@@ -58,6 +57,7 @@ Vertex *dequeue(Queue *q){
 
 
 Queue *initQueue(){
+    // mallocs and initializers NULL values for queue
     Queue *q = (Queue *)malloc(sizeof(Queue));
     q->first = malloc(sizeof(QNode));
     q->last = malloc(sizeof(QNode));
@@ -66,10 +66,9 @@ Queue *initQueue(){
 }
 
 void printQueue(Queue *q){
+    // print contents of queue for debugging/readability
     int counter = 1;
-    // printf("reached here 66\n");
     while (!isEmpty(q)) {
-        // printf("reached here 68\n");
         printf("%d\n", counter);
         dequeue(q);
         counter++;
@@ -89,13 +88,14 @@ int getMaxVert(const char *filename){
         exit(-1);
     }
 
+    // go through all values and compare to max
     while ( (fscanf(input, "%d", &int1) == 1) 
          && (fscanf(input, "%d", &int2) == 1) )  { 
         if(int1 > max) max = int1;
         if(int2 > max) max = int2;
     } 
 
-    fclose(input);
+    fclose(input); 
 
     return max;
 }
@@ -123,17 +123,14 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
         if(arr[int1] == NULL) {
             // appoint head of the list 
             arr[int1] = curr;
-            // printf("index %d is NULL\n", int1);
-
         } else {
             // or else traverse to the end of the list and add
             Vertex *tempPtr = arr[int1];
             while(tempPtr->next != NULL){
                 tempPtr = tempPtr->next;
             }
-            
+
             tempPtr->next = curr;
-            // printf("index %d is NOT NULL\n", int1);
         }
     } 
 
@@ -145,7 +142,7 @@ void bfs(Vertex **adjList){
     // use ARRLEN
     int visited[ARRLEN]; 
     for(int i = 0; i < ARRLEN; i++) {
-        // init all to unvisited status
+        // init all verticies to unvisited status
         visited[i] = 0;
     }
 
@@ -161,8 +158,8 @@ void bfs(Vertex **adjList){
 
     while(!isEmpty(q)){
         Vertex *currVert = dequeue(q);
-        // printf("dequeued %d\n ", currVert->value);
         Vertex *tempCurr = currVert;
+
         if(s == 0) {
             tempCurr = currVert;
             s = 1;
@@ -171,7 +168,7 @@ void bfs(Vertex **adjList){
         }
 
         while(tempCurr != NULL){
-            if (visited[tempCurr->value - 1] == 0) {
+            if (!visited[tempCurr->value - 1]) {
                 printf("%d ", tempCurr->value);
                 q = enqueue(q, tempCurr);
                 visited[tempCurr->value-1]  = 1;
@@ -179,20 +176,20 @@ void bfs(Vertex **adjList){
             }
             tempCurr = tempCurr->next;
         }
-        // printf("visitied: %d\n", currVert->value);
         visited[currVert->value - 1] = 2;
     }
-    puts("");
+    puts(""); 
 }
+
+
 void dfs(Vertex **adjList){
-    // Vertex **tempAdjList = adjList;
-    // int i = 0;
-    // while(tempAdjList[])
+    
 }
 
 
 int main() {
-    /* // testing code-----------------------------------
+    /* 
+    // queue testing code-----------------------------------
     //init queue
     Queue *q1 = malloc(sizeof(Queue));
     q1 = initQueue(q1);
@@ -209,6 +206,7 @@ int main() {
     // printf("reached her/e 84\n");
     printQueue(q1); // prints hi once because len(q) = 1
     //----------------------------------------------- */
+
     char *filename = "input";
 
     ARRLEN = getMaxVert(filename);
@@ -220,13 +218,12 @@ int main() {
         // printf("%d\n", i);
     }
     
-    // Vertex *arr[arrLen];
-    // *arr = adjArr;
-
     adjArr = makeAdjList(adjArr, filename);
     bfs(adjArr);
+
     // dfs(adjArr);
     // need to free all memeory ..
     // freeAdjArr(adjArr);
+
     return 0;
 }
