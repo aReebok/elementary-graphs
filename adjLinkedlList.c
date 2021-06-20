@@ -139,8 +139,10 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
 }
 
 void bfs(Vertex **adjList){
-    // use ARRLEN
+    // use ARRLEN to create an array that keeps track of 
+    // visited verticies
     int visited[ARRLEN]; 
+    
     for(int i = 0; i < ARRLEN; i++) {
         // init all verticies to unvisited status
         visited[i] = 0;
@@ -186,6 +188,41 @@ void dfs(Vertex **adjList){
     
 }
 
+/* helper function to free a linked list */
+void freeLinkedList(Vertex *lst){
+    Vertex *tempList = lst;
+    while(lst != NULL){
+        Vertex *tempList = lst;
+        lst = lst->next;
+        free(tempList);
+    }
+}
+
+/* helper function to free adjacency list */
+void freeAdjArrHelper(int i, Vertex **arr) {
+    if(i == ARRLEN-1){
+        // we want to free the linked list
+        freeLinkedList(arr[i]);
+    } else {
+        // we want to free linked list 
+        freeLinkedList(arr[i]);
+        // recursive call the func on the next item on arr
+        freeAdjArrHelper(++i, arr);
+    }
+}
+
+void freeAdjArr(Vertex **arr){
+    // takes in an adjacency list and frees every allocated memory
+    int index = 0;
+    freeAdjArrHelper(index, arr);
+    free(arr);
+}
+
+
+void freeQueue(){
+    // takes in a queue and frees all elements? 
+}
+
 
 int main() {
     /* 
@@ -210,7 +247,6 @@ int main() {
     char *filename = "input";
 
     ARRLEN = getMaxVert(filename);
-    
     Vertex **adjArr = (Vertex **)malloc(ARRLEN*sizeof(Vertex *));
 
     for (int i = 0; i < ARRLEN; i++) {
@@ -219,9 +255,12 @@ int main() {
     }
     
     adjArr = makeAdjList(adjArr, filename);
-    bfs(adjArr);
+    // bfs(adjArr);
 
+    freeAdjArr(adjArr);
+    
     // dfs(adjArr);
+    // free(adjArr);
     // need to free all memeory ..
     // freeAdjArr(adjArr);
 
