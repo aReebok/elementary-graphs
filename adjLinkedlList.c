@@ -51,7 +51,13 @@ Queue *enqueue(Queue *q, Vertex *s){
 Vertex *dequeue(Queue *q){
     // removes and returns first item on queue.
     Vertex *s = q->first->s;
+
+    QNode *tempFirst = q->first; 
     q->first = q->first->next;
+
+    // delete queue->first here...
+    free(tempFirst);
+
     return s;
 }
 
@@ -138,55 +144,9 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
     return arr;
 }
 
-void bfs(Vertex **adjList){
-    // use ARRLEN to create an array that keeps track of 
-    // visited verticies
-    int visited[ARRLEN]; 
-    
-    for(int i = 0; i < ARRLEN; i++) {
-        // init all verticies to unvisited status
-        visited[i] = 0;
-    }
-
-    // create a queue, initialize it.
-    Queue *q = initQueue();
-    
-    // enqueue first item. 
-    int s = 0;
-    q = enqueue(q, adjList[s]);
-
-    printf("%d ", s+1);
-    visited[s] = 1;
-
-    while(!isEmpty(q)){
-        Vertex *currVert = dequeue(q);
-        Vertex *tempCurr = currVert;
-
-        if(s == 0) {
-            tempCurr = currVert;
-            s = 1;
-        } else {
-            tempCurr = adjList[currVert->value-1];  
-        }
-
-        while(tempCurr != NULL){
-            if (!visited[tempCurr->value - 1]) {
-                printf("%d ", tempCurr->value);
-                q = enqueue(q, tempCurr);
-                visited[tempCurr->value-1]  = 1;
-
-            }
-            tempCurr = tempCurr->next;
-        }
-        visited[currVert->value - 1] = 2;
-    }
-    puts(""); 
-}
-
-
-void dfs(Vertex **adjList){
-    
-}
+/*
+    These functions are freeing all allocated memory 
+*/
 
 /* helper function to free a linked list */
 void freeLinkedList(Vertex *lst){
@@ -219,9 +179,73 @@ void freeAdjArr(Vertex **arr){
 }
 
 
-void freeQueue(){
+void freeQueue(Queue *q){
     // takes in a queue and frees all elements? 
+    // while(q->first != NULL){
+    //     QNode *tempQNode = q->first;
+    //     freeLinkedList(tempQNode->s);
+    //     free(tempQNode);
+    //     q->first = q->first->next;
+    // }
+    free(q->first);
+    free(q->last);
+    free(q);
 }
+
+
+void bfs(Vertex **adjList){
+    // use ARRLEN to create an array that keeps track of 
+    // visited verticies
+    int visited[ARRLEN]; 
+
+    for(int i = 0; i < ARRLEN; i++) {
+        // init all verticies to unvisited status
+        visited[i] = 0;
+    }
+
+    // create a queue, initialize it.
+    Queue *q = initQueue();
+    Queue *tempQ = q;
+    
+    // enqueue first item. 
+    int s = 0;
+    q = enqueue(q, adjList[s]);
+
+    printf("%d ", s+1);
+    visited[s] = 1;
+
+    while(!isEmpty(q)){
+        Vertex *currVert = dequeue(q);
+        Vertex *tempCurr = currVert;
+
+        if(s == 0) {
+            tempCurr = currVert;
+            s++;
+        } else {
+            tempCurr = adjList[currVert->value-1];  
+        }
+
+        while(tempCurr != NULL){
+            if (!visited[tempCurr->value - 1]) {
+                printf("%d ", tempCurr->value);
+                q = enqueue(q, tempCurr);
+                visited[tempCurr->value-1]  = 1;
+
+            }
+            tempCurr = tempCurr->next;
+        }
+
+        visited[currVert->value - 1] = 2;
+        
+    }
+    puts(""); 
+}
+
+
+void dfs(Vertex **adjList){
+    
+}
+
 
 
 int main() {
@@ -255,12 +279,11 @@ int main() {
     }
     
     adjArr = makeAdjList(adjArr, filename);
-    // bfs(adjArr);
+    bfs(adjArr);
 
     freeAdjArr(adjArr);
     
-    // dfs(adjArr);
-    // free(adjArr);
+    // dfs(adjA a
     // need to free all memeory ..
     // freeAdjArr(adjArr);
 
