@@ -6,20 +6,28 @@ int ARRLEN = 0;
 struct Vertex {
     // int d;
     int value;
-    int visited;
+    //int visited;
     struct Vertex *next;
 };
 
 typedef struct Vertex Vertex;
 
+// 48 in 3 blocks: 28 allocs 25 frees
+
 struct QNode{
+    // int randomQNode; // 64 in 3 blocks: 28 allocs, 25 frees
     Vertex *s;
     struct QNode *next;
+    // struct QNode *NONE;
+    
 };
 
 typedef struct QNode QNode;
 
+
 struct Queue{
+    // int randomQ;    // 56 in 3 blocks: 28 alloc, 25 frees
+    // Vertex *none;
     QNode *first;     // dequeue here
     QNode *last;      // enqueue here
 };
@@ -36,6 +44,7 @@ Queue *enqueue(Queue *q, Vertex *s){
     QNode *newQNode = (QNode*)malloc(sizeof(QNode)); 
     newQNode->next = NULL;
     newQNode->s = s;
+    // printf("Enqueued %d\n", s->value);
 
     if(isEmpty(q)) { // no items in queue...
         q->first = q->last = newQNode;
@@ -56,7 +65,7 @@ Vertex *dequeue(Queue *q){
     q->first = q->first->next;
 
     // delete queue->first here...
-    free(tempFirst);
+    free(tempFirst); 
 
     return s;
 }
@@ -95,14 +104,13 @@ int getMaxVert(const char *filename){
     }
 
     // go through all values and compare to max
-    while ( (fscanf(input, "%d", &int1) == 1) 
-         && (fscanf(input, "%d", &int2) == 1) )  { 
+    while ((fscanf(input, "%d", &int1) == 1) 
+         && (fscanf(input, "%d", &int2) == 1))  { 
         if(int1 > max) max = int1;
         if(int2 > max) max = int2;
     } 
 
     fclose(input); 
-
     return max;
 }
 
@@ -123,7 +131,7 @@ Vertex **makeAdjList(Vertex **arr, const char *f){
         Vertex *curr = (Vertex *)malloc(sizeof(Vertex));
         curr->value = int2;
         curr->next = NULL;
-        curr->visited = 0; 
+        //curr->visited = 0; 
         int1--; // because array starts at 0.
 
         if(arr[int1] == NULL) {
@@ -178,15 +186,15 @@ void freeAdjArr(Vertex **arr){
     free(arr);
 }
 
-
 void freeQueue(Queue *q){
-    // takes in a queue and frees all elements? 
-    // while(q->first != NULL){
-    //     QNode *tempQNode = q->first;
-    //     freeLinkedList(tempQNode->s);
-    //     free(tempQNode);
-    //     q->first = q->first->next;
-    // }
+    //takes in a queue and frees all elements? 
+    while(q->first != NULL){
+        QNode *tempQNode = q->first;
+        freeLinkedList(tempQNode->s);
+        free(tempQNode);
+        q->first = q->first->next;
+    }
+
     free(q->first);
     free(q->last);
     free(q);
@@ -230,21 +238,62 @@ void bfs(Vertex **adjList){
                 printf("%d ", tempCurr->value);
                 q = enqueue(q, tempCurr);
                 visited[tempCurr->value-1]  = 1;
-
             }
+
             tempCurr = tempCurr->next;
         }
 
         visited[currVert->value - 1] = 2;
-        
     }
-    puts(""); 
+
+    puts("");
+}
+
+void dfsVisit(Vertex* currList, int *visited){
+    // visited[i] ++;
+ 
+    while(currList != NULL){
+        int i = currList->value - 1;
+
+        if(visited[i] == 0) {
+            printf("%d ", currList->value);
+            visited[i] = 2;
+            printf("visitedLINE261[%d] = %d\n", i, visited[i]);
+
+            dfsVisit(currList, visited);
+        }
+
+        currList = currList->next;
+
+    }
+    // visited[i] = 2;
 }
 
 
 void dfs(Vertex **adjList){
-    
+    // use ARRLEN to create an array that keeps track of 
+    // visited verticies
+    int visited[ARRLEN]; 
+    for(int i = 0; i < ARRLEN; i++) {
+        // init all verticies to unvisited status
+        visited[i] = 0;
+    }
+
+    for(int i = 0; i < ARRLEN; i++) {
+        if(visited[i] == 0){
+            // printf();
+            visited[i] = 2;
+            printf("visited[%d]LINE286 = %d\n", i, visited[i]);
+
+            printf("%d ", i+1);
+            dfsVisit(adjList[i], visited);
+        }
+    }
 }
+
+
+
+
 
 
 
@@ -280,8 +329,12 @@ int main() {
     
     adjArr = makeAdjList(adjArr, filename);
     bfs(adjArr);
+    dfs(adjArr);
 
     freeAdjArr(adjArr);
+
+    // int SIZEPLS = 10;
+    // printf("size of SIZEPLS: %ld\n", sizeof(SIZEPLS));
     
     // dfs(adjA a
     // need to free all memeory ..
