@@ -334,14 +334,7 @@ int main() {
     printf("dfs: ");
     dfs(adjArr);
 
-    freeAdjArr(adjArr);
-
-    // int SIZEPLS = 10;
-    // printf("size of SIZEPLS: %ld\n", sizeof(SIZEPLS));
-    
-    // dfs(adjA a
-    // need to free all memeory ..
-    // freeAdjArr(adjArr);
+    freeAdjArr(adjArr); // 3 blocks of memory? 48 bytes unallocated.
 
     return 0;
 }
