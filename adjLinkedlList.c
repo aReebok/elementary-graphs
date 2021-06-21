@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* this implementation is from the textbook:
+
+    */
+
+
 int ARRLEN = 0;
 
 struct Vertex {
@@ -88,6 +93,84 @@ void printQueue(Queue *q){
         dequeue(q);
         counter++;
     }
+}
+
+void printGraph(Vertex **g){
+    for (int i = 0; i < ARRLEN; i++) {
+        Vertex *currVert = g[i];
+        // print array and it's linked list. 
+        printf("\n%d | ", i+1);
+        while(currVert != NULL){
+            printf("%d -> ", currVert->value);
+            currVert = currVert->next;
+        }
+        printf("NULL");
+    } 
+    puts("\n----------------------"); // prints a new line
+ 
+}
+
+int inLinkedList(int value, Vertex *lst){
+    // checks if given value is in the given linkedlist
+    while(lst != NULL){
+        if(lst->value == value)
+            return 1;
+        lst = lst->next;
+    }
+    return 0;
+}
+
+void graphSquared(Vertex **g){
+    // takes in a graph and returns a graph that is graph^2
+    // for each vertex v, take the kids of its kids and add them to v
+    // also make sure it's not already in the linked list or equal to v.
+    Vertex **tempGraph = (Vertex **)malloc(ARRLEN*sizeof(Vertex *));
+
+    for(int i = 0; i < ARRLEN; i++){
+        Vertex *frontAdd = NULL; // malloc this new list
+        Vertex *backAdd = NULL;
+        Vertex *child = g[i];      // pointer to linked list of children. 
+
+        while(child != NULL) {
+            // take the elements in g[child->value - 1]
+            Vertex *grandChild = g[child->value - 1];
+            Vertex *tempAddOn;
+            while(grandChild != NULL){
+                if((grandChild->value - 1) != i 
+                && !inLinkedList(grandChild->value, g[i]) 
+                && !inLinkedList(grandChild->value, tempGraph[i])) {
+                    // then add to the list "addToList"
+                    tempAddOn = (Vertex *)malloc(sizeof(Vertex));
+                    tempAddOn->value = grandChild->value;
+                    tempAddOn->next = NULL;
+                    if(frontAdd == NULL){ // if linked list empty, add to frong
+                        frontAdd = tempAddOn;
+                        backAdd = tempAddOn;
+                    } else { // else add to it's back.
+                        backAdd->next = tempAddOn;
+                        backAdd = backAdd->next;
+                    }
+                    tempGraph[i] = frontAdd;
+                }
+                grandChild = grandChild->next;
+            } 
+            child = child->next;
+        }
+    }
+    
+    // no add to the end of each linked list...
+    for(int i = 0; i < ARRLEN; i++) {
+        Vertex *lastElm = g[i];
+        if(lastElm != NULL){ // lastElm points to the last element on g[i]
+            while(lastElm->next != NULL){
+                lastElm = lastElm->next;
+            }
+            // add to lastElm of g[i], the first element of tempGraph[i]
+            lastElm->next = tempGraph[i];
+        }
+    }
+
+    free(tempGraph);
 }
 
 int getMaxVert(const char *filename){
@@ -291,12 +374,6 @@ void dfs(Vertex **adjList){
     puts("");
 }
 
-
-
-
-
-
-
 int main() {
     /* 
     // queue testing code-----------------------------------
@@ -328,11 +405,21 @@ int main() {
     }
     
     adjArr = makeAdjList(adjArr, filename);
+
+    
+    printf("Graph: ----------------");
+    printGraph(adjArr);
+
     printf("bfs: ");
     bfs(adjArr);
 
     printf("dfs: ");
     dfs(adjArr);
+
+    graphSquared(adjArr);
+
+    printf("Graph Squared: ---------");
+    printGraph(adjArr);
 
     freeAdjArr(adjArr); // 3 blocks of memory? 48 bytes unallocated.
 
