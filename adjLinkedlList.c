@@ -249,7 +249,7 @@ void bfs(Vertex **adjList){
     puts("");
 }
 
-void dfsVisit(Vertex* currList, int *visited){
+void dfsVisit(Vertex **adjlst, Vertex* currList, int *visited){
     // visited[i] ++;
  
     while(currList != NULL){
@@ -258,9 +258,8 @@ void dfsVisit(Vertex* currList, int *visited){
         if(visited[i] == 0) {
             printf("%d ", currList->value);
             visited[i] = 2;
-            printf("visitedLINE261[%d] = %d\n", i, visited[i]);
-
-            dfsVisit(currList, visited);
+            // printf("visitedLINE261[%d] = %d\n", i, visited[i]);
+            dfsVisit(adjlst, adjlst[i], visited);
         }
 
         currList = currList->next;
@@ -283,12 +282,13 @@ void dfs(Vertex **adjList){
         if(visited[i] == 0){
             // printf();
             visited[i] = 2;
-            printf("visited[%d]LINE286 = %d\n", i, visited[i]);
+            // printf("visited[%d]wAS == 0::LINE286 = %d\n", i, visited[i]);
 
             printf("%d ", i+1);
-            dfsVisit(adjList[i], visited);
+            dfsVisit(adjList, adjList[i], visited);
         }
     }
+    puts("");
 }
 
 
@@ -328,7 +328,10 @@ int main() {
     }
     
     adjArr = makeAdjList(adjArr, filename);
+    printf("bfs: ");
     bfs(adjArr);
+
+    printf("dfs: ");
     dfs(adjArr);
 
     freeAdjArr(adjArr);
